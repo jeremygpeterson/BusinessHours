@@ -3,7 +3,7 @@ Given /^a business that opens at "([^\"]*)" and closes at "([^\"]*)"$/ do |open,
   @hours = BusinessHours.new("9:00 AM", "3:00 PM")
 end
 
-Given /^Buisness Hours are set$/ do
+Given /^Business Hours are set$/ do
   @hours.is_a? BusinessHours
 end
 

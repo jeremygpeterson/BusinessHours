@@ -6,18 +6,20 @@ Feature: Edit Business Hours
   Background: Business Hours are Defined
     Given a business that opens at "9:00 AM" and closes at "3:00 PM"
 
-  Scenario: Update hours for a day of the week
-    Given Buisness Hours are set
-    When I Update "Friday" to open at "10:00 AM" and close at "5:00 PM"
-    Then the day/date "Friday" will open at "10:00 AM" and closes at "5:00 PM"
+  Scenario Outline: Update hours by day of week or date
+    Given Business Hours are set
+    When I Update "<day>" to open at "<open>" and close at "<close>"
+    Then the day/date "<day>" will open at "<open>" and closes at "<close>"
 
-  Scenario: Update hours for a date only
-    Given Buisness Hours are set
-    When I Update "Dec 25, 2010" to open at "8:00 AM" and close at "1:00 PM"
-    Then the day/date "Dec 25, 2010" will open at "10:00 AM" and closes at "5:00 PM"
+    Examples:
+      | day          | open     | close    |
+      | Friday       | 10:00 AM |  5:00 PM |
+      | Tuesday      |  7:00 AM |  3:45 PM |
+      | Dec 25, 2010 | 10:00 AM |  5:00 PM |
+      | Dec 26, 2010 |  9:00 AM | 11:00 AM |
 
   Scenario: Update hours to closed
-    Given Buisness Hours are set
+    Given Business Hours are set
     When I Close on "Sunday; Wednesday; Dec 25, 2010"
     Then "Sunday; Wednesday; Dec 25, 2010" days will be closed
 

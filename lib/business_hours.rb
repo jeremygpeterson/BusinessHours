@@ -1,19 +1,22 @@
 require "time"
 class BusinessHours
-  DAYS = {:sun => 0, :mon => 1, :tue => 2, :wed => 3, :thur => 4, :fri => 5, :sat => 6}
+  DAYS = [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
 
   def initialize(open, close)
-    @week = Array.new(7){day(open, close)}
+    @schedule = {}
+    DAYS.each{|d| @schedule[d] = day(open, close)}
   end
 
   def update(date, open, close)
-    @week[DAYS[date]] = day(open, close) if (date.is_a? Symbol)
+    key = (DAYS.include? date) ? date : Time.parse(date)
+    @schedule[key] = day(open, close)
   end
 
 
   private
   def get(date)
-    return @week[DAYS[date]] if (date.is_a? Symbol)
+    key = (DAYS.include? date) ? date : Time.parse(date)
+    return @schedule[key]
   end
 
   def closed(date)
