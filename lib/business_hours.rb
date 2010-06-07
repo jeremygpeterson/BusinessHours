@@ -20,7 +20,7 @@ class BusinessHours
     each(start_date) do |date, hours|
       next if closed?(hours)
       return date += remaining if((date + remaining) <= hours[:close])
-      remaining -= (hours[:close] - date)# upate seconds
+      remaining -= (hours[:close] - date) if((date) <= hours[:close])
     end
   end
 

@@ -19,4 +19,4 @@ Feature: Calculate Deadline from Business Hours
       | 2*60*60  | Jun 7, 2010 9:10 AM  | Mon Jun 07 11:10:00 2010 |
       | 15*60    | Jun 8, 2010 2:48 PM  | Thu Jun 10 09:03:00 2010 |
       | 7*60*60  | Dec 24, 2010 6:45 AM | Mon Dec 27 11:00:00 2010 |
-
+      | 15*60    | Jun 8, 2010 6:00 PM  | Thu Jun 10 09:15:00 2010 |
