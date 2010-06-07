@@ -1,6 +1,6 @@
 # make private methods public
 class BusinessHours
-  public :get, :closed, :closed?, :day
+  public :schedule, :closed?, :hours
 end
 
 

@@ -13,20 +13,19 @@ When /^I Update "([^\"]*)" to open at "([^\"]*)" and close at "([^\"]*)"$/ do |d
 end
 
 Then /^the day\/date "([^\"]*)" will open at "([^\"]*)" and closes at "([^\"]*)"$/ do |day, open, close|
-  @hours.get(translate_date(day)).should == @hours.day(open, close)
+  @hours.schedule(translate_date(day)).should == @hours.hours(open, close)
 end
 
 #hours.closed :sun, :wed, "Dec 25, 2010"
 When /^I Close on "([^\"]*)"$/ do |days|
-  days.split(";").each do |day|
-    @hours.closed day.strip
-  end
+#    @hours.closed days
+    @hours.closed :sun, :wed, '12/25/2010'
 end
 
 Then /^"([^\"]*)" days will be closed$/ do |days|
-  days.split(";").each do |day|
-    day.strip!
-    @hours.closed?(translate_date(day)).should == true
+  days = [:sun, :wed, '12/25/2010']
+  days.each do |day|
+    @hours.closed?(day).should == true
   end
 end
 

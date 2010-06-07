@@ -1,33 +1,70 @@
 require "time"
 class BusinessHours
+  @@schedule = {}
   DAYS = [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
 
+  # Setup default schedule hours
   def initialize(open, close)
-    @schedule = {}
-    DAYS.each{|d| @schedule[d] = day(open, close)}
+    DAYS.each{|day| update(day, open, close)}
+  end
+
+  def closed(*dates)
+    dates.each{|date| update(date, nil, nil)}
   end
 
   def update(date, open, close)
-    key = (DAYS.include? date) ? date : Time.parse(date)
-    @schedule[key] = day(open, close)
+    schedule(date, hours(open, close))
   end
 
+  def calculate_deadline(remaining, start_date)
+    each(start_date) do |date, hours|
+      next if closed?(hours)
+      return date += remaining if((date + remaining) <= hours[:close])
+      remaining -= (hours[:close] - date)# upate seconds
+    end
+  end
 
+  # Iterate Scheduled Business Hours
+  def each(current=Time.now, max=31*24*60*60)
+    current = parse(current)
+    stop_time = current + max
+    while(current < stop_time)
+      hours = day_hours(current)
+      current = hours[:open] if(!closed?(hours) && current < hours[:open])# force to starting time
+      yield [current, hours]
+      current = parse("0:00 AM", current + 24*60*60)# prepare for next day
+    end
+  end
+  
   private
-  def get(date)
-    key = (DAYS.include? date) ? date : Time.parse(date)
-    return @schedule[key]
+  # Schedule Setter and Getter; stores business hours for both defaults and exceptions.
+  # Example:
+  #   schedule(:sun)                            => Get Sunday's default hours
+  #   schedule("7/4/2010")                      => Get July 4th's hours
+  #   schedule(:sun, hours("8:00", "5:00 PM")}  => Set Sunday's default hours
+  def schedule(date, val=nil)
+    key = (date.is_a? Symbol) ? date : parse(date).strftime("%x")
+    if val
+      @@schedule[key] = val
+    else
+      @@schedule[key] || @@schedule[DAYS[parse(date).wday]]
+    end
   end
 
-  def closed(date)
+  def hours(open, close)
+    {:open => open, :close => close}
+  end
 
+  def day_hours(current)
+    schedule(current).inject({}){ |hash,(k,v)| hash.merge( k => parse(v, current))}
   end
 
   def closed?(date)
-    true
+    ((date.is_a? Hash) ? date : schedule(date)) == hours(nil, nil)
   end
-  
-  def day(open, close)
-    {:open => Time.parse(open), :close => Time.parse(close)}
+
+  # Parses Strings or returns Time object
+  def parse(*args)
+    (args[0].is_a? String) ? Time.parse(*args) : args[0]
   end
 end

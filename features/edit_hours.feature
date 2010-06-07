@@ -20,6 +20,5 @@ Feature: Edit Business Hours
 
   Scenario: Update hours to closed
     Given Business Hours are set
-    When I Close on "Sunday; Wednesday; Dec 25, 2010"
-    Then "Sunday; Wednesday; Dec 25, 2010" days will be closed
-
+    When I Close on ":sun, :wed, '12/25/2010'"
+    Then ":sun, :wed, '12/25/2010'" days will be closed
