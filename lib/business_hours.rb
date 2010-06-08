@@ -1,7 +1,6 @@
 require "time"
 class BusinessHours
-  @@schedule = {}
-  DAYS = [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
+  @@schedule, DAYS = {}, [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
 
   # Setup default schedule hours
   def initialize(open, close)
@@ -37,7 +36,7 @@ class BusinessHours
   end
   
   private
-  # Schedule Setter and Getter; stores business hours for both defaults and exceptions.
+  # Setter and Getter for Business Schedule; stores business hours for both defaults and exceptions.
   # Example:
   #   schedule(:sun)                            => Get Sunday's default hours
   #   schedule("7/4/2010")                      => Get July 4th's hours
@@ -63,7 +62,7 @@ class BusinessHours
     ((date.is_a? Hash) ? date : schedule(date)) == hours(nil, nil)
   end
 
-  # Parses Strings or returns Time object
+  # Returns Time Object
   def parse(*args)
     (args[0].is_a? String) ? Time.parse(*args) : args[0]
   end
