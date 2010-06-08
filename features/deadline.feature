@@ -7,7 +7,7 @@ Feature: Calculate Deadline from Business Hours
     Given a business that opens at "9:00 AM" and closes at "3:00 PM"
     When I Update "Friday" to open at "10:00 AM" and close at "5:00 PM"
     And I Update "Dec 24, 2010" to open at "8:00 AM" and close at "1:00 PM"
-    And I Close on ":sun, :wed, '12/25/2010'"
+    And I Close on "Sunday, Wednesday, 12/25/2010"
 
   Scenario Outline: Calculate deadline
     Given Business Hours are set

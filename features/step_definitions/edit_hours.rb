@@ -18,16 +18,14 @@ end
 
 #hours.closed :sun, :wed, "Dec 25, 2010"
 When /^I Close on "([^\"]*)"$/ do |days|
-#    @hours.closed days
-    @hours.closed :sun, :wed, '12/25/2010'
+  close_days = process_strings(days).join(', ')
+  eval "@hours.closed(#{close_days})"
 end
 
 Then /^"([^\"]*)" days will be closed$/ do |days|
-  days = [:sun, :wed, '12/25/2010']
-  days.each do |day|
-    @hours.closed?(day).should == true
+  process_strings(days).each do |day|
+    hours = eval "@hours.closed?(#{day})"
+    hours.should == true
   end
 end
-
-
 
