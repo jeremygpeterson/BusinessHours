@@ -11,6 +11,10 @@ class BusinessHours
     dates.each{|date| update(date, nil, nil)}
   end
 
+  def closed?(date)
+    ((date.is_a? Hash) ? date : schedule(date)) == hours(nil, nil)
+  end
+
   def update(date, open, close)
     schedule(date, hours(open, close))
   end
@@ -24,13 +28,13 @@ class BusinessHours
   end
 
   # Iterate Scheduled Business Hours
-  def each(current=Time.now, max=31*24*60*60)
+  def each(current=Time.now, max=31)
     current = parse(current)
-    stop_time = current + max
+    stop_time = current + (max*24*60*60)
     while(current < stop_time)
-      hours = day_hours(current)
-      current = hours[:open] if(!closed?(hours) && current < hours[:open])# force to starting time
-      yield [current, hours]
+      current_hours = day_hours(current)
+      current = current_hours[:open] if(!closed?(current_hours) && current < current_hours[:open])# force to starting time
+      yield [current, current_hours]
       current = parse("0:00 AM", current + 24*60*60)# prepare for next day
     end
   end
@@ -56,10 +60,6 @@ class BusinessHours
 
   def day_hours(current)
     schedule(current).inject({}){ |hash,(k,v)| hash.merge( k => parse(v, current))}
-  end
-
-  def closed?(date)
-    ((date.is_a? Hash) ? date : schedule(date)) == hours(nil, nil)
   end
 
   # Returns Time Object
