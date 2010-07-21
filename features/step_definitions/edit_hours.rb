@@ -13,7 +13,7 @@ When /^I Update "([^\"]*)" to open at "([^\"]*)" and close at "([^\"]*)"$/ do |d
 end
 
 Then /^the day\/date "([^\"]*)" will open at "([^\"]*)" and closes at "([^\"]*)"$/ do |day, open, close|
-  @hours.schedule(translate_date(day)).should == @hours.hours(open, close)
+  @hours.schedule[translate_date(day)].should == [open, close]
 end
 
 #hours.closed :sun, :wed, "Dec 25, 2010"

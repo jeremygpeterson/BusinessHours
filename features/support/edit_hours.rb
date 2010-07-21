@@ -1,6 +1,13 @@
 # make private methods public
 class BusinessHours
-  public :schedule, :closed?, :hours
+  # Simple wrapper for schedule hash
+  def schedule
+    @schedule
+  end
+
+  def closed?(date)
+    @schedule[date] == ["0:00", "0:00"]
+  end
 end
 
 

@@ -1,69 +1,66 @@
 require "time"
 class BusinessHours
-  @@schedule, DAYS = {}, [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
-
-  # Setup default schedule hours
   def initialize(open, close)
-    DAYS.each{|day| update(day, open, close)}
-  end
-
-  def closed(*dates)
-    dates.each{|date| update(date, nil, nil)}
-  end
-
-  def closed?(date)
-    ((date.is_a? Hash) ? date : schedule(date)) == hours(nil, nil)
+    @schedule = Schedule.new([open, close])
   end
 
   def update(date, open, close)
-    schedule(date, hours(open, close))
+    @schedule[date]= [open, close]
   end
 
-  def calculate_deadline(remaining, start_date)
-    each(start_date) do |date, hours|
-      next if closed?(hours)
-      return date += remaining if((date + remaining) <= hours[:close])
-      remaining -= (hours[:close] - date) if((date) <= hours[:close])
+  def closed(*dates)
+    dates.each{|date| update(date, "0:00", "0:00")}
+  end
+
+  def calculate_deadline(remaining, start_time = Time.now)
+    Deadline.new(@schedule, remaining, start_time).calculate
+  end
+
+  class Schedule
+    DAYS = [:sun, :mon, :tue, :wed, :thur, :fri, :sat]
+    def initialize(hours)
+      @schedule = {}
+      DAYS.each{|day| self[day]= hours}
+    end
+
+    def key(date)
+      (date.is_a? Symbol) ? date : Time.parse(date.to_s).strftime("%x")
+    end
+
+    def []=(date, value)
+      @schedule[key(date)] = value
+    end
+
+    def [](date)
+      @schedule[key(date)] || @schedule[DAYS[Time.parse(date.to_s).wday]]
     end
   end
 
-  # Iterate Scheduled Business Hours
-  def each(current=Time.now, max=31)
-    current = parse(current)
-    stop_time = current + (max*24*60*60)
-    while(current < stop_time)
-      current_hours = day_hours(current)
-      current = current_hours[:open] if(!closed?(current_hours) && current < current_hours[:open])# force to starting time
-      yield [current, current_hours]
-      current = parse("0:00 AM", current + 24*60*60)# prepare for next day
+  class Deadline
+    def initialize(schedule, remaining, start_time)
+      @schedule, @remaining = schedule, remaining
+      @current_time = Time.parse(start_time)
     end
-  end
-  
-  private
-  # Setter and Getter for Business Schedule; stores business hours for both defaults and exceptions.
-  # Example:
-  #   schedule(:sun)                            => Get Sunday's default hours
-  #   schedule("7/4/2010")                      => Get July 4th's hours
-  #   schedule(:sun, hours("8:00", "5:00 PM")}  => Set Sunday's default hours
-  def schedule(date, val=nil)
-    key = (date.is_a? Symbol) ? date : parse(date).strftime("%x")
-    if val
-      @@schedule[key] = val
-    else
-      @@schedule[key] || @@schedule[DAYS[parse(date).wday]]
+
+    def calculate
+      each_day do
+        return @current_time + @remaining if ((@current_time + @remaining) <= @hours.last)
+        @remaining -= (@hours.last - @current_time) if ((@current_time <= @hours.last))
+      end
     end
-  end
 
-  def hours(open, close)
-    {:open => open, :close => close}
-  end
+    def update_hours
+      @hours = @schedule[@current_time].collect {|hour| Time.parse(hour, @current_time)}
+      @current_time = @hours.first if(@hours.first && @current_time < @hours.first)# adjust to starting time
+    end
 
-  def day_hours(current)
-    schedule(current).inject({}){ |hash,(k,v)| hash.merge( k => parse(v, current))}
-  end
-
-  # Returns Time Object
-  def parse(*args)
-    (args[0].is_a? String) ? Time.parse(*args) : args[0]
+    # Iterate Scheduled Business Hours
+    def each_day
+      loop do
+        update_hours
+        yield
+        @current_time = Time.parse("0:00 AM", @current_time + 24*60*60)# prepare for next day
+      end
+    end
   end
 end
