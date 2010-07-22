@@ -2,6 +2,8 @@ Business Hours is a Ruby script which will determine the guaranteed time given a
 
 http://rubylearning.com/blog/2010/05/25/rpcfn-business-hours-10/
 
+Updated from feedback and verified that Day Light Saving time is handled correctly.
+
 Create Business Hour object
 	hours = BusinessHours.new("9:00 AM", "3:00 PM")
 
@@ -17,22 +19,3 @@ Updating Hours:
 Closed Hours:
   Method specifying days closed, where symbols (week days) and Time or String Objects define specific days. 
 	hours.closed :sun, :wed, "Dec 25, 2010"
-
-  Checking Closed hours
-	hours.closed? "Dec 25, 2010" => true
-
-Iterating Business Hours:
-  Iterates from Starting Date/Time for a maximum number of days.  Calls a block for each day with two arguments, the Time Object and a hash with open and close hours.  The Time object, returns each Time within open and close hours, unless closed.
-
-	hours = BusinessHours.new("8:00 AM", "5:00 PM")
-	hours.closed :sun
-	hours.each("6/11/2010", 5) do |date, day_hours| 
-		business_hours = (hours.closed?(date)) ? "Closed" : "#{day_hours[:open].strftime("%l:%M %p")} - #{day_hours[:close].strftime("%l:%M %p")}"
-		puts "#{date.strftime("%x")}: #{business_hours}"
-	end
-	
-	06/11/10:  8:00 AM -  5:00 PM
-	06/12/10:  8:00 AM -  5:00 PM
-	06/13/10: Closed
-	06/14/10:  8:00 AM -  5:00 PM
-	06/15/10:  8:00 AM -  5:00 PM

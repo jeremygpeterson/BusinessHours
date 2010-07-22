@@ -57,7 +57,7 @@ class BusinessHours
     def time_remaining?
       @hours = @schedule[@current_time].collect {|hour| Time.parse(hour, @current_time)}
       @current_time = (@current_time < @hours.first) ? @hours.first : (@current_time > @hours.last) ? @hours.last : @current_time # force to be inside normal business hours
-      (@current_time + @remaining) > @hours.last
+      (@current_time + @remaining) >= @hours.last
     end
   end
 end
