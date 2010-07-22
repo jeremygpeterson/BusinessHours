@@ -1,3 +1,4 @@
+@deadline
 Feature: Calculate Deadline from Business Hours
   In order to calculate deadline from business hours
   As a customer

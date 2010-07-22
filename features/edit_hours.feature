@@ -1,3 +1,4 @@
+@edit
 Feature: Edit Business Hours
   In order to track business hours
   As an owner
